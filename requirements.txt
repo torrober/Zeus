@@ -3,3 +3,4 @@ Flask-SocketIO==4.3.1
 gunicorn
 eventlet
 gevent-websocket
+flask_cors
