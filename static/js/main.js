@@ -72,33 +72,31 @@ window.onbeforeunload = function () {
     e.preventDefault();
     e.returnValue = 'Test';
 }
-const initVideo = () => {
-    navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-    }).then((stream) => {
-        myVideoStream = stream;
-        addVideoStream(myVideo, stream);
-        peer.on("call", call => {
-            call.answer(stream);
-            const video = document.createElement("video");
-            call.on("stream", userStream => {
-                addVideoStream(video, userStream);
-            })
+navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true,
+}).then((stream) => {
+    myVideoStream = stream;
+    addVideoStream(myVideo, stream);
+    peer.on("call", call => {
+        call.answer(stream);
+        const video = document.createElement("video");
+        call.on("stream", userStream => {
+            addVideoStream(video, userStream);
         })
-        socket.on('newUser', function (msg) {
-            const input = JSON.parse(msg);
-            var userID = input.userID;
-            if (input.meetingID == meetingID) {
-                console.log(`connecting to user: ${userID}`)
-                setTimeout(function () {
-                    connectToNewUser(userID, stream);
-                }, 1000);
+    })
+    socket.on('newUser', function (msg) {
+        const input = JSON.parse(msg);
+        var userID = input.userID;
+        if (input.meetingID == meetingID) {
+            console.log(`connecting to user: ${userID}`)
+            setTimeout(function () {
+                connectToNewUser(userID, stream);
+            }, 1000);
 
-            }
-        })
-    });
-}
+        }
+    })
+});
 const connectToNewUser = (userId, stream) => {
     console.log("connecting to" + userId)
     const call = peer.call(userId, stream)
@@ -120,7 +118,6 @@ socket.on('message', function (msg) {
         createUser(true)
     } else if (msg == "userOK") {
         socket.emit('newUser', JSON.stringify(user));
-        initVideo();
     } else {
         const input = JSON.parse(msg);
         if (input.user !== username && input.meetingID == meetingID) {
