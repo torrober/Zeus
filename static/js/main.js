@@ -1,6 +1,5 @@
 import Message from '../js/objects/Message.js';
 import User from '../js/objects/User.js';
-import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
 var username = "";
 const socket = io();
 var user;
