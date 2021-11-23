@@ -1,3 +1,6 @@
+import logging
+
+import engineio
 import user
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, send
@@ -5,7 +8,7 @@ from flask_cors import CORS
 import json
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+socketio = SocketIO(app, logging=True, engineio_logging=True)
 CORS(app)
 socketio.init_app(app, cors_allowed_origins="*")
 users = []
@@ -41,8 +44,10 @@ def checkUser(msg):
             if(data["meetingID"] == user.meetingID):
                 existing = True
     if (existing):
+        print("exist")
         send('userExists', broadcast=False)
     else:
+        print('nonexists')
         send('userOK', broadcast=False)
 
 
