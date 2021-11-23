@@ -1,0 +1,56 @@
+astroid==2.4.2
+autopep8==1.5.4
+bidict==0.21.4
+bottle==0.12.19
+bottle-websocket==0.2.9
+brotlipy==0.7.0
+certifi==2020.12.5
+cffi @ file:///C:/ci/cffi_1613247279197/work
+chardet @ file:///C:/ci/chardet_1607690654534/work
+click==8.0.3
+colorama==0.4.4
+conda==4.9.2
+conda-package-handling @ file:///C:/ci/conda-package-handling_1603003327818/work
+cryptography @ file:///C:/ci/cryptography_1615532531877/work
+Eel==0.14.0
+Flask==2.0.2
+Flask-SocketIO==4.3.1
+future==0.18.2
+gevent==21.8.0
+gevent-websocket==0.10.1
+greenlet==1.1.2
+idna @ file:///home/linux1/recipes/ci/idna_1610986105248/work
+isort==4.3.21
+itsdangerous==2.0.1
+Jinja2==3.0.3
+lazy-object-proxy==1.4.3
+livereload==2.6.3
+MarkupSafe==2.0.1
+mccabe==0.6.1
+menuinst==1.4.16
+pycodestyle==2.6.0
+pycosat==0.6.3
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+pylint==2.5.3
+pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1608057966937/work
+pyparsing==3.0.6
+PySocks @ file:///C:/ci/pysocks_1605287845585/work
+python-engineio==3.13.2
+python-socketio==4.6.0
+pywin32==227
+requests @ file:///tmp/build/80754af9/requests_1608241421344/work
+ruamel-yaml-conda @ file:///C:/ci/ruamel_yaml_1616016967756/work
+sip==4.19.13
+six @ file:///C:/ci/six_1605187374963/work
+toml==0.10.2
+tornado==6.1
+tqdm @ file:///tmp/build/80754af9/tqdm_1615925068909/work
+urllib3 @ file:///tmp/build/80754af9/urllib3_1615837158687/work
+websockets==10.1
+Werkzeug==2.0.2
+whichcraft==0.6.1
+win-inet-pton @ file:///C:/ci/win_inet_pton_1605306167264/work
+wincertstore==0.2
+wrapt==1.12.1
+zope.event==4.5.0
+zope.interface==5.4.0
