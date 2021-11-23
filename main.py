@@ -5,7 +5,7 @@ from flask_cors import CORS
 import json
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+socketio = SocketIO(app, logger=True, engineio_logger=True)
 CORS(app)
 socketio.init_app(app, cors_allowed_origins="*")
 users = []
@@ -60,8 +60,6 @@ def onDisconnect(msg):
     users.pop(posArray)
     
     emit('userDisconnected',msg, broadcast=True)
-
-        
 @socketio.on('message')
 def handleMessage(msg):
     print('Message: ' + msg)
