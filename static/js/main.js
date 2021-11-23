@@ -11,6 +11,42 @@ let myVideoStream;
 let peers = [];
 const myVideo = document.createElement("video");
 myVideo.muted = true;
+window.onload = () => {
+    if (isUUID(meetingID)) {
+        createUser(false)
+    } else {
+        alert("Invalid meeting ID")
+        window.location = "/"
+    }
+    $(".chat-input").on('keypress', function (e) {
+        if (e.which == (12 + 1)) {
+            var m = new Message(username, $(".chat-input").val(), meetingID);
+            document.getElementById("messages").innerHTML += m.toHTML()
+            $(".chat-input").val("");
+            socket.emit('message', JSON.stringify(m));
+        }
+    })
+    $("#leave").on('click', function (e) {
+        if (user) {
+            socket.emit('userDisconnected', JSON.stringify(user));
+        }
+        setTimeout(function () {
+            window.location = "/"
+        }, 100);
+
+    })
+    $("#hidechat").on('click', function () {
+        if (chatHidden == false) {
+            $("#main").attr('class', 'col-sm-12 p-0 main__left')
+            $("#chat").hide();
+            chatHidden = true;
+        } else {
+            $("#main").attr('class', ' main__left')
+            $("#chat").show();
+            chatHidden = false;
+        }
+    })
+}
 var peer = new Peer({
     config: {
         'iceServers': [
@@ -28,91 +64,62 @@ const isUUID = (uuid) => {
     return true;
 }
 peer.on("open", id => {
-    console.log("peer connection open!");
     peerID = id;
-    console.log(peerID);
+    console.log("connection established: " + peerID);
 })
-window.onload = () => {
-    if (isUUID(meetingID)) {
-        createUser(false)
-    } else {
-        alert("Invalid meeting ID")
-        window.location = "/"
-    }
-    $(".chat-input").on('keypress', function (e) {
-        if (e.which == (12 + 1)) {
-            var m = new Message(username, $(".chat-input").val(), meetingID);
-            document.getElementById("messages").innerHTML += m.toHTML()
-            $(".chat-input").val("");
-            socket.emit('message', JSON.stringify(m));
-        }
-    })
-    $("#leave").on('click', function (e) {
-        window.location = "/"
-    })
-    $("#hidechat").on('click', function () {
-        if (chatHidden == false) {
-            $("#main").attr('class', 'col-sm-12 p-0 main__left')
-            $("#chat").hide();
-            chatHidden = true;
-        } else {
-            $("#main").attr('class', ' main__left')
-            $("#chat").show();
-            chatHidden = false;
-        }
-    })
+window.onbeforeunload = function () {
+    e.preventDefault();
+    e.returnValue = 'Test';
 }
-window.onbeforeunload = () => {
-    if (user) {
-        socket.emit('userDisconnected', JSON.stringify(user));
-    }
-}
-navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true,
-}).then((stream) => {
+const initVideo = () => {
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+    }).then((stream) => {
         myVideoStream = stream;
-        addVideoStream(myVideo, stream, peerID);
-        socket.on('newUser', function(msg){
-            console.log("new user")
-            console.log(msg)
-            const input = JSON.parse(msg);
-            var userID = input.userID;
-            if (userID !== peerID && input.meetingID == meetingID) {
-                console.log(`connecting to user: ${userID}`)
-                connect(userID, stream, userID);
-            }
-        })
+        addVideoStream(myVideo, stream);
         peer.on("call", call => {
             call.answer(stream);
             const video = document.createElement("video");
             call.on("stream", userStream => {
-                addVideoStream(video, userStream, peerID);
+                addVideoStream(video, userStream);
             })
         })
+        socket.on('newUser', function (msg) {
+            const input = JSON.parse(msg);
+            var userID = input.userID;
+            if (input.meetingID == meetingID) {
+                console.log(`connecting to user: ${userID}`)
+                setTimeout(function () {
+                    connectToNewUser(userID, stream);
+                }, 1000);
 
+            }
+        })
     });
-const connect = (userId, stream, user) => {
-    console.log('new user detected!');
-    const call = peer.call(userId, stream);
-    console.log(call);
-    const video = document.createElement("video");
-    peers[userId] = call
-    call.on("stream", userStream => {
-        console.log('adding video stream!');
-        addVideoStream(video, userStream, user);
-    })
-    socket.on('userDisconnected', (msg) => {
-        var data = JSON.parse(msg)
-        if (peers[data.userID]) peers[data.userID].close()
-        $("#"+data.userID).remove();
-    })
 }
+const connectToNewUser = (userId, stream) => {
+    console.log("connecting to" + userId)
+    const call = peer.call(userId, stream)
+    const video = document.createElement('video')
+    call.on('stream', userVideoStream => {
+        addVideoStream(video, userVideoStream)
+    })
+    call.on('close', () => {
+        video.remove()
+    })
+    peers[userId] = call
+}
+socket.on('userDisconnected', function (msg) {
+    const data = JSON.parse(msg);
+    if (peers[data.userID]) peers[data.userID].close()
+})
 socket.on('message', function (msg) {
     if (msg == "userExists") {
         createUser(true)
     } else if (msg == "userOK") {
         socket.emit('newUser', JSON.stringify(user));
+        initVideo();
     } else {
         const input = JSON.parse(msg);
         if (input.user !== username && input.meetingID == meetingID) {
@@ -121,14 +128,8 @@ socket.on('message', function (msg) {
         }
     }
 });
-const addVideoStream = (video, stream, user) => {
+const addVideoStream = (video, stream) => {
     video.srcObject = stream
-    console.log(user)
-    video.setAttribute('autoplay', '');
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('id', user)
-    video.setAttribute('class', 'embed-responsive embed-responsive-4by3')
     video.addEventListener('loadedmetadata', () => {
         video.play();
         videoGrid.append(video);

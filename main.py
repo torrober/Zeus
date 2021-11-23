@@ -51,13 +51,14 @@ def onDisconnect(msg):
     i = 0
     posArray = 0
     data = json.loads(msg)
+    print("user "+ data["username"]+ " from meeting "+data["meetingID"]+ " disconnected")
     for user in users:
         if(data["username"] == user.username):
             if(data["meetingID"] == user.meetingID):
                 posArray = i
         i = i + 1
     users.pop(posArray)
-    print("user "+ data["username"]+ " from meeting "+data["meetingID"]+ " disconnected")
+    
     emit('userDisconnected',msg, broadcast=True)
 
         
