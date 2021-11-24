@@ -58,9 +58,11 @@ window.onload = () => {
     })
     $("#mute").on('click', function() {
         toggleMute();
+        console.log("Muted "+  myVideoStream.getAudioTracks()[0].enabled)
     });
     $("#video").on('click', function() {
         toggleVideo();
+        console.log("Video "+  myVideoStream.getVideoTracks()[0].enabled)
     });
 }
 var peer = new Peer({
@@ -101,24 +103,24 @@ const toggleMute = () =>{
     console.log(enabled);
     if (enabled) {
         myVideoStream.getAudioTracks()[0].enabled = false;
-        $("#muteIcon").attr('class', 'fas fa-microphone-slash fa-2x');
-        $("#mute span").text("Mute");
+        $("#muteIcon").attr('class', 'fas fa-microphone fa-2x');
+        $("#mute span").text("Start Audio");
       } else {
         myVideoStream.getAudioTracks()[0].enabled = true;
-        $("#muteIcon").attr('class', 'fas fa-microphone fa-2x');
-        $("#mute span").text("Unmute");
+        $("#muteIcon").attr('class', 'fas fa-microphone-slash fa-2x');
+        $("#mute span").text("Stop Audio");
     }
 }
 const toggleVideo = () => {
     let enabled = myVideoStream.getVideoTracks()[0].enabled;
     if (enabled) {
         myVideoStream.getVideoTracks()[0].enabled = false;
-        $("#videoIcon").attr('class', 'fas fa-video-slash fa-2x');
-        $("#video span").text("Stop Video");
-      } else {
-        myVideoStream.getVideoTracks()[0].enabled = true;
         $("#videoIcon").attr('class', 'fas fa-video fa-2x');
         $("#video span").text("Start Video");
+      } else {
+        myVideoStream.getVideoTracks()[0].enabled = true;
+        $("#videoIcon").attr('class', 'fas fa-video-slash fa-2x');
+        $("#video span").text("Stop Video");
     }   
 }
 const initStream = () => {
