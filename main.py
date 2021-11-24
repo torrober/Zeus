@@ -59,8 +59,7 @@ def onDisconnect(msg):
     users.pop(posArray)
     print("user "+ data["username"]+ " from meeting "+data["meetingID"]+ " disconnected")
     emit('userDisconnected',msg, broadcast=True)
-
-        
+    
 @socketio.on('message')
 def handleMessage(msg):
     print('Message: ' + msg)

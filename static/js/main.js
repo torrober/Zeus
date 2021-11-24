@@ -76,37 +76,39 @@ window.onbeforeunload = function () {
     e.preventDefault();
     e.returnValue = 'Test';
 }
-navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true,
-}).then((stream) => {
-    myVideoStream = stream;
-    addVideoStream(myVideo, stream);
-    peer.on("call", call => {
-        call.answer(stream);
-        const video = document.createElement("video");
-        call.on("stream", userStream => {
-            addVideoStream(video, userStream);
+const initStream = () => {
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+    }).then((stream) => {
+        myVideoStream = stream;
+        addVideoStream(myVideo, stream, peerID);
+        peer.on("call", call => {
+            console.log(call.peer);
+            call.answer(stream);
+            const video = document.createElement("video");
+            call.on("stream", userStream => {
+                addVideoStream(video, userStream,call.peer);
+            })
         })
-    })
-    socket.on('newUser', function (msg) {
-        const input = JSON.parse(msg);
-        var userID = input.userID;
-        if (input.meetingID == meetingID) {
-            console.log(`connecting to user: ${userID}`)
-            setTimeout(function () {
-                connectToNewUser(userID, stream);
-            }, 1000);
-
-        }
-    })
-});
+        socket.on('newUser', function (msg) {
+            const input = JSON.parse(msg);
+            var userID = input.userID;
+            if (input.meetingID == meetingID) {
+                setTimeout(function () {
+                    connectToNewUser(userID, stream);
+                }, 2000);
+    
+            }
+        })
+    });
+}
 const connectToNewUser = (userId, stream) => {
-    console.log("connecting to" + userId)
     const call = peer.call(userId, stream)
     const video = document.createElement('video')
     call.on('stream', userVideoStream => {
-        addVideoStream(video, userVideoStream)
+        addVideoStream(video, userVideoStream, userId)
+        console.log(`connecting to user: ${userId}`)
     })
     call.on('close', () => {
         video.remove()
@@ -115,13 +117,17 @@ const connectToNewUser = (userId, stream) => {
 }
 socket.on('userDisconnected', function (msg) {
     const data = JSON.parse(msg);
-    if (peers[data.userID]) peers[data.userID].close()
+    if (peers[data.userID]){
+        peers[data.userID].close()
+    }
+    $("#"+data.userID).remove();
 })
 socket.on('message', function (msg) {
     if (msg == "userExists") {
         createUser(true)
     } else if (msg == "userOK") {
         socket.emit('newUser', JSON.stringify(user));
+        initStream();
     } else {
         const input = JSON.parse(msg);
         if (input.user !== username && input.meetingID == meetingID) {
@@ -130,8 +136,10 @@ socket.on('message', function (msg) {
         }
     }
 });
-const addVideoStream = (video, stream) => {
+const addVideoStream = (video, stream, userID) => {
     video.srcObject = stream
+    video.autoplay = true;
+    video.id = userID
     video.addEventListener('loadedmetadata', () => {
         video.play();
         videoGrid.append(video);
