@@ -51,6 +51,12 @@ window.onload = () => {
             chatHidden = false;
         }
     })
+    $("#mute").on('click', function() {
+        toggleMute();
+    });
+    $("#video").on('click', function() {
+        toggleVideo();
+    });
 }
 var peer = new Peer({
     config: {
@@ -76,6 +82,31 @@ window.onbeforeunload = function () {
     e.preventDefault();
     e.returnValue = 'Test';
 }
+const toggleMute = () =>{
+    let enabled = myVideoStream.getAudioTracks()[0].enabled;
+    console.log(enabled);
+    if (enabled) {
+        myVideoStream.getAudioTracks()[0].enabled = false;
+        $("#muteIcon").attr('class', 'fas fa-microphone-slash fa-2x');
+        $("#mute span").text("Mute");
+      } else {
+        myVideoStream.getAudioTracks()[0].enabled = true;
+        $("#muteIcon").attr('class', 'fas fa-microphone fa-2x');
+        $("#mute span").text("Unmute");
+    }
+}
+const toggleVideo = () => {
+    let enabled = myVideoStream.getVideoTracks()[0].enabled;
+    if (enabled) {
+        myVideoStream.getVideoTracks()[0].enabled = false;
+        $("#videoIcon").attr('class', 'fas fa-video-slash fa-2x');
+        $("#video span").text("Stop Video");
+      } else {
+        myVideoStream.getVideoTracks()[0].enabled = true;
+        $("#videoIcon").attr('class', 'fas fa-video fa-2x');
+        $("#video span").text("Start Video");
+    }   
+}
 const initStream = () => {
     navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -98,7 +129,6 @@ const initStream = () => {
                 setTimeout(function () {
                     connectToNewUser(userID, stream);
                 }, 2000);
-    
             }
         })
     });
@@ -139,9 +169,16 @@ socket.on('message', function (msg) {
 const addVideoStream = (video, stream, userID) => {
     video.srcObject = stream
     video.autoplay = true;
-    video.id = userID
+    video.id = userID;
     video.addEventListener('loadedmetadata', () => {
         video.play();
+        if(document.querySelectorAll('.cameras video').length > 5 && document.getElementById('video-grid') !== null){
+            $("#video-grid").attr('id', 'video-grid-plus5');
+            videoGrid = document.getElementById('video-grid-plus5');
+        } else if (document.querySelectorAll('.cameras video').length < 5 && document.getElementById('video-grid-plus5') !== null)  {
+            $("#video-grid").attr('id', 'video-grid-plus5');
+            videoGrid = document.getElementById("video-grid");
+        }
         videoGrid.append(video);
     })
 }

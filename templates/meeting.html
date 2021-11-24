@@ -19,7 +19,7 @@
     <div class="main__meeting" id="app" style="visibility: hidden;">
         <div class="main__left" id="main">
             <div class="main__videos">
-                <div id="video-grid">
+                <div id="video-grid" class="cameras">
                 </div>
             </div>
                 <div class="main__controls">
@@ -27,13 +27,13 @@
                         <div class="row">
                             <div class="col col-cbar">
                                 <div class="row w-100">
-                                    <div class="col icon-row pointer">
-                                        <i class="fas fa-microphone fa-2x"></i>
-                                        Unmute
+                                    <div class="col icon-row pointer" id="mute">
+                                        <i class="fas fa-microphone fa-2x" id="muteIcon"></i>
+                                        <span>Mute</span>
                                     </div>
-                                    <div class="col icon-row pointer">
-                                        <i class="fas fa-video fa-2x"></i>
-                                        Start Video
+                                    <div class="col icon-row pointer" id="video">
+                                        <i class="fas fa-video fa-2x" id="videoIcon"></i>
+                                        <span>Stop Video</span>
                                     </div>
                                 </div>
                             </div>
