@@ -30,9 +30,14 @@ window.onload = () => {
         if (user) {
             socket.emit('userDisconnected', JSON.stringify(user));
         }
+        Swal.fire(
+            'Leaving room',
+            'This might take a while.',
+            'info'
+        )
         setTimeout(function () {
             window.location = "/"
-        }, 100);
+        }, 2000);
 
     })
     $("#hidechat").on('click', function () {
