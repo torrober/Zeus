@@ -20,7 +20,12 @@ window.onload = () => {
     }
     $(".chat-input").on('keypress', function (e) {
         if (e.which == (12 + 1)) {
-            var m = new Message(username, $(".chat-input").val(), meetingID);
+            if(isValidHttpUrl($(".chat-input").val())){
+                var msg = '<a href="'+$(".chat-input").val()+'" target="_blank">'+$(".chat-input").val()+'</a>'
+                var m = new Message(username, msg, meetingID);
+            } else {
+                var m = new Message(username, $(".chat-input").val(), meetingID);
+            }
             document.getElementById("messages").innerHTML += m.toHTML()
             $(".chat-input").val("");
             socket.emit('message', JSON.stringify(m));
@@ -73,6 +78,15 @@ const isUUID = (uuid) => {
         return false;
     }
     return true;
+}
+function isValidHttpUrl(str) {
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return pattern.test(str);
 }
 peer.on("open", id => {
     peerID = id;
